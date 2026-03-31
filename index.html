@@ -21,13 +21,11 @@
             cursor: none; 
         }
 
-        /* 🔦 Interactive Spotlight Effect */
         .spotlight {
             position: fixed; inset: 0; z-index: 1; pointer-events: none;
             background: radial-gradient(circle 450px at var(--cursor-x) var(--cursor-y), rgba(188, 19, 254, 0.06), transparent 80%);
         }
 
-        /* ✨ Neon Custom Cursor */
         #custom-cursor {
             width: 10px; height: 10px; background: #08f7fe; border-radius: 50%;
             position: fixed; pointer-events: none; z-index: 9999;
@@ -52,7 +50,7 @@
         #figure-container { 
             z-index: 60; pointer-events: none; position: fixed; 
             bottom: 0; left: 50%; transform: translateX(-50%);
-            height: 85vh; width: auto;
+            height: 75vh; width: auto;
             transition: left 0.8s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s ease;
         }
         #mohid-img { height: 100%; width: auto; object-fit: contain; filter: drop-shadow(0 0 25px rgba(188, 19, 254, 0.2)); }
@@ -70,7 +68,12 @@
         ::-webkit-scrollbar-track { background: #050505; }
         ::-webkit-scrollbar-thumb { background: #08f7fe; border-radius: 10px; }
 
-        @media (max-width: 768px) { #custom-cursor { display: none; } #figure-container { height: 60vh; } }
+        /* ==================== MOBILE RESPONSIVENESS ==================== */
+        @media (max-width: 768px) { 
+            #custom-cursor { display: none; } 
+            #figure-container { height: 55vh; }
+            #central-title { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -78,6 +81,7 @@
     <div id="custom-cursor"></div>
     <div class="spotlight"></div>
 
+    <!-- LOADING SCREEN -->
     <div id="loading-screen" class="fixed inset-0 bg-black z-[100] flex flex-col justify-center items-center">
         <h1 class="font-black text-2xl tracking-[0.8em] neon-blue italic uppercase">Initializing_System</h1>
         <div class="w-[250px] h-[2px] bg-[#111] mt-5 relative overflow-hidden">
@@ -86,30 +90,32 @@
         <p id="status-text" class="text-[10px] text-gray-600 mt-4 tracking-[0.4em] uppercase font-mono italic">Status: Syncing_Core...</p>
     </div>
 
-    <section class="relative h-screen w-full flex items-center justify-between px-10 md:px-24 overflow-hidden">
+    <section class="relative min-h-screen w-full flex flex-col lg:flex-row items-center justify-center lg:justify-between px-6 md:px-16 lg:px-24 py-10 lg:py-0 overflow-hidden">
         
-        <div id="central-title" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[110%] z-10 pointer-events-none">
+        <div id="central-title" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[110%] z-10 pointer-events-none hidden lg:block">
             <h1 class="text-[12vw] font-black text-white/5 uppercase italic tracking-tighter leading-none select-none" style="filter: blur(1px);">
                 Portfolio
             </h1>
         </div>
 
-        <div id="nav-left" onclick="openSection('about')" class="z-30 cursor-pointer group">
-            <h2 class="text-4xl md:text-5xl font-black group-hover:neon-purple transition-all italic tracking-tighter uppercase">It's Me</h2><br>
-            <h2 class="text-6xl md:text-8xl font-black group-hover:neon-purple transition-all italic tracking-tighter uppercase">Mohid</h2>
-            
+        <!-- NAV LEFT -->
+        <div id="nav-left" onclick="openSection('about')" class="z-30 cursor-pointer group text-center lg:text-left order-2 lg:order-1 mt-8 lg:mt-0 w-full lg:w-auto">
+            <h2 class="text-4xl sm:text-5xl md:text-5xl font-black group-hover:neon-purple transition-all italic tracking-tighter uppercase">It's Me</h2>
+            <h2 class="text-6xl sm:text-7xl md:text-8xl font-black group-hover:neon-purple transition-all italic tracking-tighter uppercase">Mohid</h2>
         </div>
 
-        <div id="figure-container">
+        <!-- FIGURE -->
+        <div id="figure-container" class="order-1 lg:order-2 mx-auto lg:mx-0">
             <img id="mohid-img" src="Mohid.png" alt="Mohid Figure">
         </div>
 
-        <div id="nav-right" onclick="openSection('skills')" class="z-30 cursor-pointer text-right group">
-            <h2 class="text-4xl md:text-5xl font-black group-hover:neon-blue transition-all uppercase leading-none italic">Web<br>Developer</h2>
+        <!-- NAV RIGHT -->
+        <div id="nav-right" onclick="openSection('skills')" class="z-30 cursor-pointer text-center lg:text-right group order-3 mt-12 lg:mt-0 w-full lg:w-auto">
+            <h2 class="text-4xl sm:text-5xl md:text-5xl font-black group-hover:neon-blue transition-all uppercase leading-none italic">Web<br>Developer</h2>
         </div>
 
         <div id="overlay" onclick="closeSection()" class="flex items-start justify-center pt-10 pb-20">
-            <div id="content-display" class="w-full max-w-6xl px-10 pointer-events-auto" onclick="event.stopPropagation()"></div>
+            <div id="content-display" class="w-full max-w-6xl px-4 md:px-10 pointer-events-auto" onclick="event.stopPropagation()"></div>
         </div>
     </section>
 
@@ -144,17 +150,20 @@
         const figure = document.getElementById('figure-container');
         const img = document.getElementById('mohid-img');
 
-        // 📂 OPEN SECTION
+        // 📂 OPEN SECTION (with mobile-friendly figure movement)
         function openSection(type) {
             gsap.to(["#nav-left", "#nav-right", "#central-title"], { opacity: 0, y: 20, duration: 0.4 });
             document.getElementById('overlay').style.display = 'flex';
             gsap.to("#overlay", { opacity: 1, duration: 0.5 });
 
+            const isMobile = window.innerWidth < 768;
+
             if (type === 'about') {
-                gsap.to(figure, { opacity: 1, left: '82%', duration: 1, ease: "power3.inOut" });
+                const targetLeft = isMobile ? '62%' : '82%';
+                gsap.to(figure, { opacity: 1, left: targetLeft, duration: 1, ease: "power3.inOut" });
                 img.style.transform = "scaleX(-1)"; 
                 document.getElementById('content-display').innerHTML = `
-                    <div class="py-20 md:pr-[35%]">
+                    <div class="py-20 lg:pr-[35%]">
                         <h3 class="text-7xl font-black neon-purple italic mb-8 uppercase tracking-tighter">About_Me</h3>
                         <p class="text-3xl text-gray-400 leading-relaxed font-light mb-12">
                             I am a <span class="text-white font-bold underline decoration-purple-600">CS student</span> at Islamia University of Bahawalpur. 
@@ -225,6 +234,7 @@
                                     <img src="Projecrt2-img2.png" alt="View 2" class="work-img">
                                     <div class="p-4 bg-black/60 text-xs text-center tracking-widest uppercase">02_SignUp</div>
                                 </div>
+                            </div>
                         </div>
                     </div>
                 `;
