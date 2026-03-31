@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohid | CS & Web Dev Portfolio</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --cursor-x: 0px; --cursor-y: 0px; }
+        
+        body { 
+            background-color: #050505; 
+            color: #fff; 
+            font-family: 'Rajdhani', sans-serif; 
+            overflow-x: hidden; 
+            margin: 0; 
+            cursor: none; 
+        }
+
+        /* 🔦 Interactive Spotlight Effect */
+        .spotlight {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background: radial-gradient(circle 450px at var(--cursor-x) var(--cursor-y), rgba(188, 19, 254, 0.06), transparent 80%);
+        }
+
+        /* ✨ Neon Custom Cursor */
+        #custom-cursor {
+            width: 10px; height: 10px; background: #08f7fe; border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999;
+            box-shadow: 0 0 15px #08f7fe; transition: transform 0.1s ease;
+        }
+
+        .neon-purple { text-shadow: 0 0 20px #bc13fe; color: #bc13fe; }
+        .neon-blue { text-shadow: 0 0 20px #08f7fe; color: #08f7fe; }
+        
+        .glass-card { 
+            background: rgba(15, 15, 15, 0.85); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(20px); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .glass-card:hover { 
+            border-color: #08f7fe; 
+            box-shadow: 0 0 30px rgba(8, 247, 254, 0.15); 
+            transform: translateY(-8px);
+        }
+
+        #figure-container { 
+            z-index: 60; pointer-events: none; position: fixed; 
+            bottom: 0; left: 50%; transform: translateX(-50%);
+            height: 85vh; width: auto;
+            transition: left 0.8s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s ease;
+        }
+        #mohid-img { height: 100%; width: auto; object-fit: contain; filter: drop-shadow(0 0 25px rgba(188, 19, 254, 0.2)); }
+
+        #overlay { 
+            position: fixed; inset: 0; z-index: 50; 
+            background: rgba(0, 0, 0, 0.96); backdrop-filter: blur(25px); 
+            display: none; opacity: 0; overflow-y: auto;
+        }
+
+        .work-img { width: 100%; height: 200px; object-fit: cover; opacity: 0.5; transition: 0.5s; }
+        .group:hover .work-img { opacity: 1; transform: scale(1.05); }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #08f7fe; border-radius: 10px; }
+
+        @media (max-width: 768px) { #custom-cursor { display: none; } #figure-container { height: 60vh; } }
+    </style>
+</head>
+<body>
+
+    <div id="custom-cursor"></div>
+    <div class="spotlight"></div>
+
+    <div id="loading-screen" class="fixed inset-0 bg-black z-[100] flex flex-col justify-center items-center">
+        <h1 class="font-black text-2xl tracking-[0.8em] neon-blue italic uppercase">Initializing_System</h1>
+        <div class="w-[250px] h-[2px] bg-[#111] mt-5 relative overflow-hidden">
+            <div id="progress-bar" class="absolute h-full bg-[#08f7fe] w-0 shadow-[0_0_15px_#08f7fe]"></div>
+        </div>
+        <p id="status-text" class="text-[10px] text-gray-600 mt-4 tracking-[0.4em] uppercase font-mono italic">Status: Syncing_Core...</p>
+    </div>
+
+    <section class="relative h-screen w-full flex items-center justify-between px-10 md:px-24 overflow-hidden">
+        
+        <div id="central-title" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[110%] z-10 pointer-events-none">
+            <h1 class="text-[12vw] font-black text-white/5 uppercase italic tracking-tighter leading-none select-none" style="filter: blur(1px);">
+                Portfolio
+            </h1>
+        </div>
+
+        <div id="nav-left" onclick="openSection('about')" class="z-30 cursor-pointer group">
+            <h2 class="text-6xl md:text-8xl font-black group-hover:neon-purple transition-all italic tracking-tighter uppercase">Mohid</h2>
+            <p class="text-xs text-gray-500 tracking-[0.5em] mt-2 uppercase">ID_Access_01</p>
+        </div>
+
+        <div id="figure-container">
+            <img id="mohid-img" src="mohid.png" alt="Mohid Figure">
+        </div>
+
+        <div id="nav-right" onclick="openSection('skills')" class="z-30 cursor-pointer text-right group">
+            <h2 class="text-4xl md:text-5xl font-black group-hover:neon-blue transition-all uppercase leading-none italic">Web<br>Developer</h2>
+            <p class="text-xs text-gray-500 tracking-[0.5em] mt-2 uppercase">Tech_Class_Dev</p>
+        </div>
+
+        <div id="overlay" onclick="closeSection()" class="flex items-start justify-center pt-10 pb-20">
+            <div id="content-display" class="w-full max-w-6xl px-10 pointer-events-auto" onclick="event.stopPropagation()"></div>
+            <div class="fixed bottom-5 left-0 w-full text-center text-gray-600 text-[10px] tracking-[0.8em] animate-pulse uppercase pointer-events-none">
+                Click background to disconnect
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // 🖱️ MOUSE EFFECTS
+        const cursor = document.getElementById('custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            document.documentElement.style.setProperty('--cursor-x', e.clientX + 'px');
+            document.documentElement.style.setProperty('--cursor-y', e.clientY + 'px');
+            gsap.to(cursor, { x: e.clientX - 5, y: e.clientY - 5, duration: 0.1 });
+        });
+
+        // ⏳ LOADER
+        window.addEventListener('load', () => {
+            let width = 0;
+            const bar = document.getElementById('progress-bar');
+            const interval = setInterval(() => {
+                width += 2.5; 
+                bar.style.width = width + '%';
+                if (width >= 100) {
+                    clearInterval(interval);
+                    gsap.to("#loading-screen", { opacity: 0, duration: 0.8, onComplete: () => {
+                        document.getElementById('loading-screen').remove();
+                        gsap.from("#nav-left, #nav-right", { y: 50, opacity: 0, duration: 1, stagger: 0.3 });
+                        gsap.from("#figure-container", { y: 150, opacity: 0, duration: 1.5, ease: "expo.out" });
+                        gsap.from("#central-title", { scale: 0.9, opacity: 0, duration: 2, delay: 0.5 });
+                    }});
+                }
+            }, 30);
+        });
+
+        const figure = document.getElementById('figure-container');
+        const img = document.getElementById('mohid-img');
+
+        // 📂 OPEN SECTION
+        function openSection(type) {
+            gsap.to(["#nav-left", "#nav-right", "#central-title"], { opacity: 0, y: 20, duration: 0.4 });
+            document.getElementById('overlay').style.display = 'flex';
+            gsap.to("#overlay", { opacity: 1, duration: 0.5 });
+
+            if (type === 'about') {
+                gsap.to(figure, { opacity: 1, left: '82%', duration: 1, ease: "power3.inOut" });
+                img.style.transform = "scaleX(-1)"; 
+                document.getElementById('content-display').innerHTML = `
+                    <div class="py-20 md:pr-[35%]">
+                        <h3 class="text-7xl font-black neon-purple italic mb-8 uppercase tracking-tighter">About_Me</h3>
+                        <p class="text-3xl text-gray-400 leading-relaxed font-light mb-12">
+                            I am a <span class="text-white font-bold underline decoration-purple-600">CS student</span> at Islamia University of Bahawalpur. 
+                            22 years old. Passionate coder building high-end websites and learning <span class="neon-purple">Game Development</span>.
+                        </p>
+                        <h4 class="text-xl font-bold neon-blue mb-6 italic uppercase tracking-widest">Connect_With_Me</h4>
+                        <div class="grid grid-cols-2 gap-4 max-w-md">
+                            <a href="https://github.com/mohid-bin-waqas" target='blank' class="glass-card py-4 px-6 rounded-lg font-bold hover:neon-purple transition text-center uppercase text-sm">Github</a>
+                            <a href="https://www.linkedin.com/in/mohid-bin-waqas/" target='blank' class="glass-card py-4 px-6 rounded-lg font-bold hover:neon-blue transition text-center uppercase text-sm">Linkedin</a>
+                            <a href="https://instagram.com/mohidbinwaqas/" target='blank' class="glass-card py-4 px-6 rounded-lg font-bold hover:neon-purple transition text-center uppercase text-sm">Instagram</a>
+                            <a href="https://x.com/mohidwaqas786" target='blank' class="glass-card py-4 px-6 rounded-lg font-bold hover:neon-blue transition text-center uppercase text-sm">X_Portal</a>
+                        </div>
+                    </div>
+                `;
+            } else {
+                gsap.to(figure, { opacity: 0, y: 50, duration: 0.4 });
+                document.getElementById('content-display').innerHTML = `
+                    <div class="py-20 flex flex-col items-center">
+                        <h3 class="text-6xl font-black neon-blue italic mb-10 uppercase tracking-tighter">Web_Arsenal</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 w-full mb-20">
+                            <div class="glass-card p-5 rounded-xl border-blue-500/20">
+                                <h4 class="neon-blue text-[10px] mb-2 uppercase font-bold tracking-widest">Frontend</h4>
+                                <p class="text-lg leading-tight">HTML, CSS, JS, JQuery, Bootstrap</p>
+                            </div>
+                            <div class="glass-card p-5 rounded-xl border-purple-500/20">
+                                <h4 class="neon-purple text-[10px] mb-2 uppercase font-bold tracking-widest">Backend</h4>
+                                <p class="text-lg leading-tight">Python, Django</p>
+                            </div>
+                            <div class="glass-card p-5 rounded-xl border-blue-500/20">
+                                <h4 class="neon-blue text-[10px] mb-2 uppercase font-bold tracking-widest">Game_Dev</h4>
+                                <p class="text-lg leading-tight">C, C++, C#, Unity</p>
+                            </div>
+                            <div class="glass-card p-5 rounded-xl border-purple-500/20">
+                                <h4 class="neon-purple text-[10px] mb-2 uppercase font-bold tracking-widest">Apps</h4>
+                                <p class="text-lg leading-tight">VS Code, Unity, MonoDevelop</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-20 w-full">
+                            <h4 class="text-white font-bold italic mb-10 tracking-[0.3em] uppercase underline decoration-blue-500 underline-offset-8 text-center">Project 1 Archive</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="glass-card group overflow-hidden rounded-xl border-white/5">
+                                    <img src="project-img1.jpg" alt="View 1" class="work-img">
+                                    <div class="p-4 bg-black/60 text-xs text-center tracking-widest uppercase">01_Interface_System</div>
+                                </div>
+                                <div class="glass-card group overflow-hidden rounded-xl border-white/5">
+                                    <img src="project-img2.jpg" alt="View 2" class="work-img">
+                                    <div class="p-4 bg-black/60 text-xs text-center tracking-widest uppercase">02_Navigation_Logic</div>
+                                </div>
+                                <div class="glass-card group overflow-hidden rounded-xl border-white/5">
+                                    <img src="project-img3.jpg" alt="View 3" class="work-img">
+                                    <div class="p-4 bg-black/60 text-xs text-center tracking-widest uppercase">03_About_Module</div>
+                                </div>
+                                <div class="glass-card group overflow-hidden rounded-xl border-white/5">
+                                    <img src="project-img4.jpg" alt="View 4" class="work-img">
+                                    <div class="p-4 bg-black/60 text-xs text-center tracking-widest uppercase">04_Contact_Portal</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-20 w-full">
+                            <h4 class="text-white font-bold italic mb-10 tracking-[0.3em] uppercase underline decoration-blue-500 underline-offset-8 text-center">Project 2 Archive</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="glass-card group overflow-hidden rounded-xl border-white/5">
+                                    <img src="Projecrt2-img.png" alt="View 1" class="work-img">
+                                    <div class="p-4 bg-black/60 text-xs text-center tracking-widest uppercase">01_Login</div>
+                                </div>
+                                <div class="glass-card group overflow-hidden rounded-xl border-white/5">
+                                    <img src="Projecrt2-img2.png" alt="View 2" class="work-img">
+                                    <div class="p-4 bg-black/60 text-xs text-center tracking-widest uppercase">02_SignUp</div>
+                                </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // ❌ CLOSE SECTION
+        function closeSection() {
+            gsap.to(figure, { opacity: 1, left: '50%', y: 0, duration: 0.8, ease: "power2.inOut" });
+            img.style.transform = "scaleX(1)";
+            gsap.to("#overlay", { opacity: 0, duration: 0.4, onComplete: () => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('content-display').innerHTML = ''; 
+            }});
+            gsap.to(["#nav-left", "#nav-right", "#central-title"], { opacity: 1, y: 0, scale: 1, duration: 0.6 });
+        }
+    </script>
+</body>
+</html>
